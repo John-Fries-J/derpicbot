@@ -6,12 +6,30 @@ module.exports = {
     name: Events.GuildRoleUpdate,
     async execute(oldRole, newRole) {
         console.log(`GuildRoleUpdate triggered for role: ${newRole.name} (${newRole.id})`);
+
         const channelId = config.logChannels.roleLogs;
         const channel = newRole.guild.channels.cache.get(channelId) || newRole.guild.channels.cache.find(ch => ch.name === 'logs');
         if (!channel || !channel.permissionsFor(newRole.guild.members.me).has(PermissionsBitField.Flags.SendMessages)) {
             console.log('Log channel not found or bot lacks permission to send messages.');
             return;
         }
+
+        try {
+            const fetchedLogs = await newRole.guild.fetchAuditLogs({ type: 30, limit: 1 });
+            const roleCreateLog = fetchedLogs.entries.first();
+
+            if (roleCreateLog && roleCreateLog.target.id === newRole.id) {
+                const timeSinceCreation = Date.now() - roleCreateLog.createdTimestamp;
+                
+                if (timeSinceCreation < 5000) {
+                    console.log(`Skipping update log: Role "${newRole.name}" was just created.`);
+                    return;
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching audit logs:', error);
+        }
+
         let changes = [];
         const oldPerms = new PermissionsBitField(oldRole.permissions.bitfield);
         const newPerms = new PermissionsBitField(newRole.permissions.bitfield);
@@ -49,14 +67,11 @@ module.exports = {
 
         let executor = "Unknown User";
         try {
-            const fetchedLogs = await newRole.guild.fetchAuditLogs({
-                type: 31,
-                limit: 1
-            });
-            const auditEntry = fetchedLogs.entries.first();
-
-            if (auditEntry && auditEntry.target.id === newRole.id) {
-                executor = `<@${auditEntry.executor.id}>`;
+            const fetchedLogs = await newRole.guild.fetchAuditLogs({ type: 31, limit: 1 });
+            const roleUpdateLog = fetchedLogs.entries.first();
+            
+            if (roleUpdateLog && roleUpdateLog.target.id === newRole.id) {
+                executor = `<@${roleUpdateLog.executor.id}>`;
             }
         } catch (error) {
             console.error('Error fetching audit logs:', error);
