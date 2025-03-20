@@ -25,10 +25,6 @@ module.exports = {
                 limit: 5
             });
             const deletionLog = fetchedLogs.entries.find(entry => {
-                console.log(
-                    `Checking log: Executor ${entry.executor.id}, Target ${entry.target.id} (Message Author: ${message.author.id})`
-                );
-
                 return (
                     entry.target.id === message.author.id &&
                     (Date.now() - entry.createdTimestamp) < 10000
