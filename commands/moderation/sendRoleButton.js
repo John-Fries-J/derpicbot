@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
-const { roleMappings } = require('../../config.json');
+const { roleMappings, devs } = require('../../config.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -7,7 +7,7 @@ module.exports = {
         .setDescription('Send a reaction role message'),
     async execute(interaction) {
         if (!interaction.guild) return;
-        if (interaction.member.roles.cache.has('1255658299571961955')) return interaction.reply({ content: 'You do not have permission to use this command.', ephemeral: true });
+        if (!devs.includes(interaction.user.id)) return interaction.reply({ content: 'You do not have permission to use this command.', ephemeral: true });
         const embed = new EmbedBuilder()
             .setTitle('Get Notified!')
             .setDescription('Click the button to add/remove the notification role.')
