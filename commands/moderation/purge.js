@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
-const { adminRole } = require('../../config.json');
+const { roles } = require('../../config.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -8,7 +8,7 @@ module.exports = {
         .setDMPermission(false)
         .addIntegerOption(option => option.setName('amount').setDescription('The amount of messages to delete').setRequired(true)),
     async execute(interaction) {
-        if (!interaction.member.permissions.has(PermissionFlagsBits.ManageMessages) && !interaction.member.roles.cache.has(adminRole)) {
+        if (!interaction.member.permissions.has(PermissionFlagsBits.ManageMessages) && !interaction.member.roles.cache.has(roles.adminRole)) {
             return await interaction.reply({ content: 'You do not have permission to use this command.', ephemeral: true });
         }
         const amount = interaction.options.getInteger('amount');

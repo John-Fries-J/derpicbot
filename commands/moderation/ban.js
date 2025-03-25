@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const { red } = require('../../colors.json');
-const { modRole } = require('../../config.json');
+const { roles } = require('../../config.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -11,7 +11,7 @@ module.exports = {
         .addStringOption(option => option.setName('reason').setDescription('The reason for the ban'))
         .addStringOption(option => option.setName('duration').setDescription('The duration of the ban (e.g., 1d, 1h)').setRequired(false)),
     async execute(interaction) {
-        if (!interaction.member.permissions.has(PermissionFlagsBits.BanMembers) && !interaction.member.roles.cache.has(modRole)) {
+        if (!interaction.member.permissions.has(PermissionFlagsBits.BanMembers) && !interaction.member.roles.cache.has(roles.modRole)) {
             return await interaction.reply({ content: 'You do not have permission to use this command', ephemeral: true });
         }
         const user = interaction.options.getUser('user');

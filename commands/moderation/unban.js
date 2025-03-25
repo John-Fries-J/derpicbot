@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
-const { modRole } = require('../../config.json');
+const { roles } = require('../../config.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -8,7 +8,7 @@ module.exports = {
         .setDMPermission(false)
         .addUserOption(option => option.setName('user').setDescription('The user to unban').setRequired(true)),
     async execute(interaction) {
-        if (!interaction.member.permissions.has(PermissionFlagsBits.BanMembers) && !interaction.member.roles.cache.has(modRole)) {
+        if (!interaction.member.permissions.has(PermissionFlagsBits.BanMembers) && !interaction.member.roles.cache.has(roles.modRole)) {
             return await interaction.reply({ content: 'You do not have permission to use this command.', ephemeral: true });
         }
         const user = interaction.options.getUser('user');

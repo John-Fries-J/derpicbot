@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const { orange } = require('../../colors.json');
-const { modRole } = require('../../config.json');
+const { roles } = require('../../config.json');
 
 function parseDuration(durationString) {
     const regex = /(\d+)(s|m|h|d|w)/;
@@ -34,7 +34,7 @@ module.exports = {
         .addStringOption(option => option.setName('duration').setDescription('The duration of the mute e.g., 1s, 5m, 2h, 3d, 1w').setRequired(true))
         .addStringOption(option => option.setName('reason').setDescription('The reason for the mute').setRequired(false)),
     async execute(interaction) {
-        if (!interaction.member.permissions.has(PermissionFlagsBits.ManageMessages) && !interaction.member.roles.cache.has(modRole)) {
+        if (!interaction.member.permissions.has(PermissionFlagsBits.ManageMessages) && !interaction.member.roles.cache.has(roles.modRole)) {
             return await interaction.reply({ content: 'You do not have permission to use this command.', ephemeral: true });
         }
         const user = interaction.options.getUser('user');
