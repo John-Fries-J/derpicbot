@@ -1,0 +1,45 @@
+{
+    "token":"Enter your bot token here",
+    "devs":["630070645874622494"],
+    "suggestionID": "Enter where you want the suggestion to be sent",
+    "statusName": "Enter the status name here",
+    "clientId": "Enter your client ID here",
+	"guildId": "Enter your guild ID here",
+    "logChannels":{
+        "logChannel":"Enter your log channel ID here (most bot logs tbh)",
+        "messageDelete": "Enter your message delete log channel ID here",
+        "editMessage": "Enter your edit message log channel ID here",
+        "threadCreate": "Enter your thread create log channel ID here",
+        "threadDelete": "Enter your thread delete log channel ID here",
+        "threadUpdate": "Enter your thread update log channel ID here",
+        "roleLogs": "Enter your role logs channel ID here"
+    },
+    "WelcomeEmbed": {
+        "title": "Welcome to the server!",
+        "description": "Welcome ${user}!\nGo to <#1346268397003870209> to get your roles!\nGo to <#1255658299596996666> to read up on the rules!\nGo to <#1319064573046952027> to go check out our partners!",
+        "thumbnail": "https://cdn.discordapp.com/attachments/932110932245622865/932110932245622865/unknown.png",
+        "footer": "Welcome to the server!",
+        "footerIcon": "https://cdn.discordapp.com/attachments/932110932245622865/932110932245622865/unknown.png"
+    },
+    "Twitch": {
+        "ClientId": "Enter your twitch client ID here",
+        "AccessToken": "Enter your twitch access token here",
+        "streamerId": "Enter your streamer ID here",
+        "discordChannelId": "Enter your discord channel ID here",
+        "streamerName": "Enter your streamer name here"
+    },
+    "roleMessageID": "Enter your role message ID here",
+    "roleMappings": {
+        "Event Ping": "Enter your event ping role ID here",
+        "Video Ping": "Enter your video ping role ID here"
+    },
+    "roles": {
+        "modRole": "Enter your mod role ID here",
+        "adminRole": "Enter your admin role ID here",
+        "autoRoleId": "Enter your auto role ID here",
+        "autoRoleId1": "Enter your auto role ID here",
+        "autoRoleId2": "Enter your auto role ID here",
+        "autoRoleId3": "Enter your auto role ID here"
+    }
+    
+}
