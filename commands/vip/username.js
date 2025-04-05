@@ -68,7 +68,7 @@ try {
         
         const embed = new EmbedBuilder()
             .setTitle('Whitelist Submission!')
-            .setDescription(`**Minecraft Username:** ${newUsername}\n**UUID:** \`${uuid}\``)
+            .setDescription(`**Minecraft Username:** \`${newUsername}\`\n**UUID:** \`${uuid}\``)
             .setColor(blue)
             .setTimestamp()
             .setThumbnail(avatarUrl)
