@@ -4,3 +4,4 @@ node_modules/
 events/botDms.js
 whitelist.txt
 whitelistlogs.json
+whitelist.json
