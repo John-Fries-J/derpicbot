@@ -22,7 +22,7 @@ module.exports = {
 				.setRequired(true)
 		),
 	async execute(interaction) {
-		if (!interaction.member.roles.cache.has('1319434671934935210')) {
+		if (!interaction.member.roles.cache.has('1319434671934935210') || !interaction.member.roles.cache.has('1393092761452019813')) {
 			return interaction.reply({ content: 'You do not have permission to use this command.', ephemeral: true });
 		}
 
