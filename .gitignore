@@ -5,3 +5,4 @@ events/botDms.js
 whitelist.txt
 whitelistlogs.json
 whitelist.json
+PRODconfig.json
