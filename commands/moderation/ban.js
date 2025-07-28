@@ -1,6 +1,47 @@
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const { red } = require('../../colors.json');
-const { roles } = require('../../config.json');
+const { modRole } = require('../../config.json');
+const mysql = require('../../mysql');
+
+function parseDuration(durationString) {
+    const regex = /^(\d+)([smhdwMy]|mo(?:nths?)?|y(?:ears?)?)$/i;
+    const match = durationString ? durationString.match(regex) : null;
+    if (!match) return NaN;
+
+    const value = parseInt(match[1]);
+    const unit = match[2].toLowerCase();
+
+    switch (unit) {
+        case 's': return value * 1000;
+        case 'm': return value * 60 * 1000;
+        case 'h': return value * 60 * 60 * 1000;
+        case 'd': return value * 24 * 60 * 60 * 1000;
+        case 'w': return value * 7 * 24 * 60 * 60 * 1000;
+        case 'mo': case 'mon': case 'mons': return value * 30 * 24 * 60 * 60 * 1000;
+        case 'y': case 'yr': case 'yrs': return value * 365 * 24 * 60 * 60 * 1000;
+        default: return NaN;
+    }
+}
+
+const savePunishment = async (punishment) => {
+    const sql = 'INSERT INTO punishments (type, user_tag, user_id, punished_by_tag, punished_by_id, reason, length, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+    const values = [
+        punishment.type,
+        punishment.userTag,
+        punishment.userId,
+        punishment.punishedByTag,
+        punishment.punishedById,
+        punishment.reason,
+        punishment.length,
+        punishment.date
+    ];
+    try {
+        await mysql.query(sql, values);
+    } catch (error) {
+        console.error(`Error saving ${punishment.type} to database:`, error);
+        throw error;
+    }
+};
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -11,79 +52,73 @@ module.exports = {
         .addStringOption(option => option.setName('reason').setDescription('The reason for the ban'))
         .addStringOption(option => option.setName('duration').setDescription('The duration of the ban (e.g., 1d, 1h)').setRequired(false)),
     async execute(interaction) {
-        if (!interaction.member.permissions.has(PermissionFlagsBits.BanMembers) && !interaction.member.roles.cache.has(roles.modRole)) {
+        if (!interaction.member.permissions.has(PermissionFlagsBits.BanMembers) && !interaction.member.roles.cache.has(modRole)) {
             return await interaction.reply({ content: 'You do not have permission to use this command', ephemeral: true });
         }
+
         const user = interaction.options.getUser('user');
         const reason = interaction.options.getString('reason') || 'No reason provided';
         const duration = interaction.options.getString('duration');
-
         const member = interaction.guild.members.cache.get(user.id);
 
-        if (!interaction.member.permissions.has('BAN_MEMBERS')) {
-            return await interaction.reply({ content: 'You do not have permission to use this command', ephemeral: true });
-        }
-
-        if (!member.bannable) {
+        if (!member?.bannable) {
             return await interaction.reply({ content: 'I cannot ban this user', ephemeral: true });
         }
 
         const embed = new EmbedBuilder()
             .setTitle('User Banned')
-            .setDescription(`You have been banned from the server${reason ? ` for the following reason: ${reason}` : ''}`)
+            .setDescription(`You have been banned from ${interaction.guild.name}${reason ? ` for: ${reason}` : ''}`)
             .setTimestamp()
             .setColor(red);
 
         try {
             await member.send({ embeds: [embed] });
         } catch (error) {
-            await member.ban({ reason: `${reason} | Users DMS were disabled` });
-            return await interaction.reply({ content: `Unable to send message to user's DMs. User may have DMs disabled. User still banned! for ${reason}`, ephemeral: true });
+            console.log(`Unable to DM ${user.tag}: ${error.message}`);
         }
 
-        await member.ban({ reason: reason });
+        try {
+            await member.ban({ reason });
+            await interaction.reply({ content: `User ${user.tag} has been banned for ${reason}`, ephemeral: true });
 
-        await interaction.reply({ content: `User ${user.tag} has been banned from the server for ${reason}`, ephemeral: true });
+            const punishment = {
+                type: 'Ban',
+                userTag: user.tag,
+                userId: user.id,
+                punishedByTag: interaction.user.tag,
+                punishedById: interaction.user.id,
+                reason,
+                length: duration || 'Permanent',
+                date: new Date().toISOString()
+            };
+            await savePunishment(punishment);
 
-        if (duration) {
-            const durationInMillis = parseDuration(duration);
-            if (!isNaN(durationInMillis) && durationInMillis > 0) {
-                setTimeout(async () => {
-                    await interaction.guild.members.unban(user.id, 'Automatic unban after specified duration');
-                }, durationInMillis);
+            if (duration) {
+                const durationInMillis = parseDuration(duration);
+                if (!isNaN(durationInMillis) && durationInMillis > 0) {
+                    setTimeout(async () => {
+                        try {
+                            await interaction.guild.members.unban(user.id, 'Automatic unban after specified duration');
+                            const unbanPunishment = {
+                                type: 'Unban',
+                                userTag: user.tag,
+                                userId: user.id,
+                                punishedByTag: 'Automatic',
+                                punishedById: '0',
+                                reason: 'Automatic unban after specified duration',
+                                length: 'N/A',
+                                date: new Date().toISOString()
+                            };
+                            await savePunishment(unbanPunishment);
+                        } catch (error) {
+                            console.error('Error during automatic unban:', error);
+                        }
+                    }, durationInMillis);
+                }
             }
+        } catch (error) {
+            console.error('Failed to ban user:', error);
+            await interaction.reply({ content: 'Failed to ban the user', ephemeral: true });
         }
     },
 };
-
-function parseDuration(duration) {
-    const regex = /(\d+)([smhdwMy]|mo(?:nths?)?|y(?:ears?))?/i;
-    const match = duration.match(regex);
-    if (!match) return NaN;
-
-    const value = parseInt(match[1]);
-    const unit = match[2].toLowerCase();
-
-    switch (unit) {
-        case 's':
-            return value * 1000;
-        case 'm':
-            return value * 60 * 1000;
-        case 'h':
-            return value * 60 * 60 * 1000;
-        case 'd':
-            return value * 24 * 60 * 60 * 1000;
-        case 'w':
-            return value * 7 * 24 * 60 * 60 * 1000;
-        case 'mo':
-        case 'mon':
-        case 'mons':
-            return value * 30 * 24 * 60 * 60 * 1000;
-        case 'y':
-        case 'yr':
-        case 'yrs':
-            return value * 365 * 24 * 60 * 60 * 1000;
-        default:
-            return NaN;
-    }
-}
