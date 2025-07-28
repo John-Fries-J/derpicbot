@@ -1,10 +1,11 @@
 const { Events, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { orange } = require('../colors.json');
-const { spamReportChannel } = require('../config.json');
+const { spamReportChannel, roles } = require('../config.json');
 
 module.exports = {
     name: Events.MessageCreate,
     async execute(message) {
+        const modRole = roles.modRole;
         if (!message.content) return;
         if (!message.reference) return;
         if (message.author.bot) return;
@@ -42,7 +43,7 @@ module.exports = {
                         .setStyle(ButtonStyle.Secondary)
                 );
 
-            await reportChannel.send({ embeds: [embed], components: [row] });
+            await reportChannel.send({ content: `<@&${modRole}>`,embeds: [embed], components: [row] });
         } catch (error) {}
     }
 };
