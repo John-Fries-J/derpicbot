@@ -1,5 +1,5 @@
 {
-  "name": "DerpicBot",
+  "name": "derpicbot",
   "version": "1.0.0",
   "description": "basic discord bot with simple commands",
   "dependencies": {
