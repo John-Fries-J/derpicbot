@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const { modRole } = require('../../config.json');
 const mysql = require('../../mysql');
+const { formatMySQLDateTime } = require('../../events/utils.js');
 
 const savePunishment = async (punishment) => {
     const sql = 'INSERT INTO punishments (type, user_tag, user_id, punished_by_tag, punished_by_id, reason, length, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
@@ -12,7 +13,7 @@ const savePunishment = async (punishment) => {
         punishment.punishedById,
         punishment.reason,
         punishment.length,
-        punishment.date
+        formatMySQLDateTime(new Date())
     ];
     try {
         await mysql.query(sql, values);

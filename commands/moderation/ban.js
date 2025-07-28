@@ -2,6 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('disc
 const { red } = require('../../colors.json');
 const { modRole } = require('../../config.json');
 const mysql = require('../../mysql');
+const { formatMySQLDateTime } = require('../../events/utils.js');
 
 function parseDuration(durationString) {
     const regex = /^(\d+)([smhdwMy]|mo(?:nths?)?|y(?:ears?)?)$/i;
@@ -33,7 +34,7 @@ const savePunishment = async (punishment) => {
         punishment.punishedById,
         punishment.reason,
         punishment.length,
-        punishment.date
+        formatMySQLDateTime(new Date())
     ];
     try {
         await mysql.query(sql, values);

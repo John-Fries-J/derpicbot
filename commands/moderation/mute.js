@@ -2,6 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('disc
 const { orange } = require('../../colors.json');
 const { modRole } = require('../../config.json');
 const mysql = require('../../mysql');
+const { formatMySQLDateTime } = require('../../events/utils.js');
 
 function parseDuration(durationString) {
     const regex = /^(\d+)([smhdwMy]|mo(?:nths?)?|y(?:ears?)?)$/i;
@@ -33,7 +34,7 @@ const savePunishment = async (punishment) => {
         punishment.punishedById,
         punishment.reason,
         punishment.length,
-        punishment.date
+        formatMySQLDateTime(new Date())
     ];
     try {
         await mysql.query(sql, values);
@@ -101,13 +102,14 @@ module.exports = {
                 punishedByTag: interaction.user.tag,
                 punishedById: interaction.user.id,
                 reason,
-                length: durationString,
-                date: new Date().toISOString()
+                length: durationString
             };
             await savePunishment(punishment);
         } catch (error) {
             console.error('Failed to mute user:', error);
-            await interaction.reply({ content: 'Failed to mute the user', ephemeral: true });
+            if (!interaction.replied && !interaction.deferred) {
+                await interaction.reply({ content: 'Failed to mute the user', ephemeral: true });
+            }
         }
     },
 };
