@@ -1,8 +1,19 @@
-const { roles } = require('../config.json');
+const { roles, welcomeID, WelcomeEmbed } = require('../config.json');
+const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
     name: 'guildMemberAdd',
     execute(member) {
+        const channelId = welcomeID;
+        const channel = member.guild.channels.cache.get(channelId);
+        if (!channel) { return console.error(`Channel with ID ${channelId} not found.`); }
+        const embed = new EmbedBuilder()
+            .setTitle(WelcomeEmbed.title)
+            .setDescription(WelcomeEmbed.description.replace('${user}', member.user))
+            .setThumbnail(WelcomeEmbed.thumbnail)
+            .setFooter({ text: WelcomeEmbed.footer, iconURL: WelcomeEmbed.footerIcon })
+            .setColor('#0099ff');
+        channel.send({ embeds: [embed] });
         const roleIds = [
             roles.autoRoleId,
             roles.autoRoleId1,
