@@ -18,7 +18,12 @@ const savePunishment = async (punishment) => {
         punishment.length,
         formatMySQLDateTime(new Date())
     ];
-    await mysql.query(sql, values);
+    try {
+        await mysql.query(sql, values);
+    } catch (error) {
+        console.error(`Error saving ${punishment.type} to database:`, error);
+        throw error;
+    }
 };
 
 module.exports = {
