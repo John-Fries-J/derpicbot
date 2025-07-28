@@ -1,12 +1,13 @@
 const mysql = require('mysql');
+const { mysqlConfig } = require('./config.json');
 
 const pool = mysql.createPool({
     connectionLimit: 10,
-    host: 'localhost',
-    user: 'root',
-    password: 'root',
-    database: 'discord_bot',
-    insecureAuth: true, 
+    host: mysqlConfig.host,
+    user: mysqlConfig.user,
+    password: mysqlConfig.password,
+    database: mysqlConfig.database,
+    insecureAuth: true,
 });
 
 module.exports = {
