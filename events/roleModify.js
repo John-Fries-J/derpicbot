@@ -5,12 +5,12 @@ const config = require('../config.json');
 module.exports = {
     name: Events.GuildRoleUpdate,
     async execute(oldRole, newRole) {
-        console.log(`GuildRoleUpdate triggered for role: ${newRole.name} (${newRole.id})`);
+        console.info(`GuildRoleUpdate triggered for role: ${newRole.name} (${newRole.id})`);
 
         const channelId = config.logChannels.roleLogs;
         const channel = newRole.guild.channels.cache.get(channelId) || newRole.guild.channels.cache.find(ch => ch.name === 'logs');
         if (!channel || !channel.permissionsFor(newRole.guild.members.me).has(PermissionsBitField.Flags.SendMessages)) {
-            console.log('Log channel not found or bot lacks permission to send messages.');
+            console.warn('Log channel not found or bot lacks permission to send messages.');
             return;
         }
 
@@ -22,7 +22,6 @@ module.exports = {
                 const timeSinceCreation = Date.now() - roleCreateLog.createdTimestamp;
                 
                 if (timeSinceCreation < 5000) {
-                    console.log(`Skipping update log: Role "${newRole.name}" was just created.`);
                     return;
                 }
             }
@@ -61,7 +60,6 @@ module.exports = {
         }
 
         if (changes.length === 0) {
-            console.log('No relevant changes detected.');
             return;
         }
 
@@ -84,6 +82,5 @@ module.exports = {
             .setTimestamp();
 
         await channel.send({ embeds: [logEmbed] });
-        console.log('Embed sent successfully.');
     }
 };

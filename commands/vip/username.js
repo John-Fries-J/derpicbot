@@ -64,7 +64,6 @@ try {
 		fs.writeFileSync(logsFile, JSON.stringify(logs, null, 2), 'utf8');
 
         const avatarUrl = `https://crafatar.com/avatars/${uuid}`;
-        console.log(`Using avatar: ${avatarUrl}`);
         
         const embed = new EmbedBuilder()
             .setTitle('Whitelist Submission!')

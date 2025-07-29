@@ -75,7 +75,7 @@ module.exports = {
         try {
             await member.send({ embeds: [embed] });
         } catch (error) {
-            console.log(`Unable to DM ${user.tag}: ${error.message}`);
+            console.info(`Unable to DM ${user.tag}: ${error.message}`);
         }
 
         try {

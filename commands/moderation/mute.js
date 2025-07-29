@@ -92,7 +92,7 @@ module.exports = {
             try {
                 await member.send({ embeds: [dmEmbed] });
             } catch (error) {
-                console.log(`Unable to DM ${user.tag}: ${error.message}`);
+                console.info(`Unable to DM ${user.tag}: ${error.message}`);
             }
 
             const punishment = {

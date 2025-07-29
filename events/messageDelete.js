@@ -6,13 +6,11 @@ module.exports = {
     name: Events.MessageDelete,
     async execute(message) {
         if (!message.guild || message.author?.bot) return;
+        if (!message.content || message.content.trim() === '') return;
 
         const channelId = config.logChannels?.messageDelete;
         const channel = message.guild.channels.cache.get(channelId) || message.guild.channels.cache.find(ch => ch.name === 'logs');
-        if (!channel) {
-            console.warn('Logging channel not found for message deletion.');
-            return;
-        }
+        if (!channel) return;
 
         const messageContent = message.content || '[No content]';
         let deleter = 'Unknown or self-deleted';
@@ -33,12 +31,8 @@ module.exports = {
 
             if (deletionLog) {
                 deleter = `<@${deletionLog.executor.id}>`;
-            } else {
-                console.warn("No matching audit log entry found.");
             }
-        } catch (error) {
-            console.error('Error fetching audit logs:', error);
-        }
+        } catch (error) {}
 
         const logEmbed = new EmbedBuilder()
             .setTitle(`Message deleted in #${message.channel.name}`)
@@ -51,10 +45,6 @@ module.exports = {
             .setColor(blue)
             .setTimestamp();
 
-        try {
-            await channel.send({ embeds: [logEmbed] });
-        } catch (error) {
-            console.error('Error sending log message:', error);
-        }
+        await channel.send({ embeds: [logEmbed] });
     }
 };

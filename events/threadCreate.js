@@ -9,7 +9,7 @@ module.exports = {
         const channel = thread.guild.channels.cache.get(channelId) || thread.guild.channels.cache.find(ch => ch.name === 'logs');
         
         if (!channel) {
-            console.log('Log channel not found');
+            console.warn('Log channel not found');
             return;
         }
         const logEmbed = new EmbedBuilder()

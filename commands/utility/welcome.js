@@ -10,7 +10,7 @@ module.exports = {
     async execute(interaction) {
         if (!config.WelcomeEmbed.title || !config.WelcomeEmbed.description || !config.WelcomeEmbed.footer || !config.WelcomeEmbed.thumbnail) {
             interaction.reply({ content: 'The welcome embed is not set up properly. Please check the config file.', ephemeral: true });
-            console.log('The welcome embed is not set up properly. Please check the config file.');
+            console.warn('The welcome embed is not set up properly. Please check the config file.');
             return;
         }
 

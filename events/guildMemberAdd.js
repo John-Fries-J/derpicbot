@@ -23,11 +23,11 @@ module.exports = {
 
         roleIds.forEach(roleId => {
             if (member.roles.cache.has(roleId)) {
-                console.log(`User: ${member.user.tag} already has the role: ${roleId}`);
+                return;
             } else {
                 member.roles.add(roleId)
-                    .then(() => console.log(`Added role: ${roleId} to user: ${member.user.tag}`))
-                    .catch(err => console.log(`Failed to add role: ${roleId} to user: ${member.user.tag} - Error: ${err}`));
+                    .then(() => console.info(`Added role: ${roleId} to user: ${member.user.tag}`))
+                    .catch(err => console.error(`Failed to add role: ${roleId} to user: ${member.user.tag} - Error: ${err}`));
             }
         });
     },
