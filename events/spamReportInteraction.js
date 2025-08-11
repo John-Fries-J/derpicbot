@@ -30,12 +30,15 @@ module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction) {
         if (!interaction.isButton()) return;
+        if (!interaction.customId.startsWith('spam_')) return;
+
+        await interaction.deferReply({ ephemeral: true });
 
         if (!modRole) {
-            return await interaction.reply({ content: 'Error: Moderator role not configured.', ephemeral: true });
+            return await interaction.editReply({ content: 'Error: Moderator role not configured.' });
         }
         if (!interaction.member.roles.cache.has(modRole)) {
-            return await interaction.reply({ content: 'You do not have permission to use these buttons.', ephemeral: true });
+            return await interaction.editReply({ content: 'You do not have permission to use these buttons.' });
         }
 
         let action, targetUserId;
@@ -45,13 +48,11 @@ module.exports = {
         } else {
             const parts = interaction.customId.split('_');
             if (parts.length < 3) {
-                return await interaction.reply({ content: 'Error: Invalid button ID format.', ephemeral: true });
+                return await interaction.editReply({ content: 'Error: Invalid button ID format.' });
             }
             action = `${parts[0]}_${parts[1]}`;
             targetUserId = parts[2];
         }
-
-        await interaction.deferReply({ ephemeral: true });
 
         try {
             if (action === 'spam_delete') {
@@ -146,11 +147,7 @@ module.exports = {
                 await interaction.editReply({ content: 'Error: Unknown button action.' });
             }
         } catch (error) {
-            if (!interaction.replied && !interaction.deferred) {
-                await interaction.reply({ content: 'An error occurred while processing the action.', ephemeral: true });
-            } else if (interaction.deferred) {
-                await interaction.editReply({ content: 'An error occurred while processing the action.' });
-            }
+            await interaction.editReply({ content: 'An error occurred while processing the action.' });
         }
     }
 };
