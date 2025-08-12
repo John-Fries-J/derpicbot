@@ -13,6 +13,8 @@ module.exports = {
             return;
         }
 
+        if (oldThread.name === newThread.name && oldThread.ownerId === newThread.ownerId) return;
+
         const logEmbed = new EmbedBuilder()
             .setTitle(`Thread edited in ${oldThread.parent.name}`)
             .setDescription(`Thread edited by <@${oldThread.ownerId}>\nOld thread: ${oldThread.name}\nNew thread: ${newThread.name}`)
