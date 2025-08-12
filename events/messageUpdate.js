@@ -13,6 +13,8 @@ module.exports = {
             return;
         }
 
+        if (oldMessage.author?.bot || !newMessage.content || newMessage.content.trim() === '') return;
+
         const logEmbed = new EmbedBuilder()
             .setTitle(`Message edited in #${oldMessage.channel.name}`)
             .setDescription(`Message edited by ${oldMessage.author.tag}\nOld message: ${oldMessage.content}\nNew message: ${newMessage.content}\n[Jump to message](${newMessage.url})`)
