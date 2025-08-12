@@ -14,13 +14,22 @@ module.exports = {
         }
 
         if (interaction.isButton()) {
-            const logEmbed = new EmbedBuilder()
-                .setTitle(`${interaction.user.tag} Clicked a button`)
-                .setDescription(`${interaction.user.tag} clicked a button in ${interaction.channel}`)
-                .setColor(blue)
-                .setTimestamp();
+            if (interaction.channel.startsWith('ticket-')) {
+                const ticketEmbed = new EmbedBuilder()
+                    .setTitle(`${interaction.user.tag} Clicked a button`)
+                    .setDescription(`${interaction.user.tag} clicked a button in ${interaction.channel.name}`)
+                    .setColor(blue)
+                    .setTimestamp();
+                channel.send({ embeds: [ticketEmbed] });
+            } else {
+                const logEmbed = new EmbedBuilder()
+                    .setTitle(`${interaction.user.tag} Clicked a button`)
+                    .setDescription(`${interaction.user.tag} clicked a button in ${interaction.channel.name}`)
+                    .setColor(blue)
+                    .setTimestamp();
             channel.send({ embeds: [logEmbed] });
-        } else {
+            }
+        } else if (interaction.isCommand()) {
             const logEmbed = new EmbedBuilder()
                 .setTitle(`${interaction.user.tag} ran a command`)
                 .setDescription(`Command ran in ${interaction.channel}, by ${interaction.user.tag}.\nCommand: ${interaction.commandName}\n[Go there](https://discord.com/channels/${interaction.guild.id}/${interaction.channel.id}/${interaction.id})`)
